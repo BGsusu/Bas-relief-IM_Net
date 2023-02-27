@@ -77,7 +77,7 @@ class loadData():
         for idx,file in enumerate(br_filelist):
             # print("relief model file path: ",file)
             data = np.load(file)
-            pts.append(np.array(data[:,0:3]))
+            pts.append(np.array(data[:,0:4]))
             sdf.append(np.array(data[:,-1]))
             
             # 根据浮雕文件路径名寻找对应的原始模型
@@ -159,6 +159,35 @@ class loadData():
             up_list = up.split(" ")
             up_list = [float(x) for x in up_list]
             
+            fc_np = np.array(fc_list)
+            pos_np = np.array(pos_list)
+            up_np = np.array(up_list)
+            # 生成相机空间矩阵，并处理pts到相机空间
+            # 1、首先我们求得N = eye – lookat，并把N归一化
+            N = pos_np - fc_np
+            N_norm = N / np.linalg.norm(N)
+            # 2、up和N叉积得到U, U= up X N，归一化U
+            U = np.cross(up_np, N_norm)
+            U_norm = U / np.linalg.norm(U)
+            # 3、然后N和U叉积得到V
+            V = np.cross(N_norm, U_norm)
+            V_norm = V / np.linalg.norm(V)
+            # 4、求出视角坐标系的矩阵表示
+            Z = np.append(N_norm,0)
+            X = np.append(U_norm,0)
+            Y = np.append(V_norm,0)
+            P = np.append(pos_np,1)
+            np_viewcoord = np.array([X,Y,Z,P])
+            M_viewcoord = np.matrix(np_viewcoord)
+            # 5、求逆矩阵
+            M_view = M_viewcoord.I
+            
+            # pts = np.array(pts)
+            for idx in range(len(pts[0])):
+                pts[0][idx][3] = 1
+                pts[0][idx] = np.dot(pts[0][idx], M_view)
+            # 空间变换完成，但是没有验证，应该是对的
+            
             camera_list = pos_list+fc_list+up_list
             camera_list = np.array(camera_list)
             camera_list = np.expand_dims(camera_list,0).repeat(50000,axis=0)
@@ -169,6 +198,7 @@ class loadData():
 
         # numpy to tensor
         pts = np.array(pts)
+        pts = pts[:,:,0:3]
         sdf = np.array(sdf)
         mpts = np.array(mpts)
         camera = np.array(camera)

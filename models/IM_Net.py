@@ -13,7 +13,7 @@ class im_generator(nn.Module):
 		self.z_dim = z_dim
 		self.point_dim = point_dim
 		self.gf_dim = gf_dim
-		self.linear_1 = nn.Linear(self.z_dim+self.point_dim+camera_dim, self.gf_dim*8, bias=True)
+		self.linear_1 = nn.Linear(self.z_dim+self.point_dim, self.gf_dim*8, bias=True)
 		self.linear_2 = nn.Linear(self.gf_dim*8, self.gf_dim*8, bias=True)
 		self.linear_3 = nn.Linear(self.gf_dim*8, self.gf_dim*8, bias=True)
 		self.linear_4 = nn.Linear(self.gf_dim*8, self.gf_dim*4, bias=True)
@@ -42,9 +42,9 @@ class im_generator(nn.Module):
 		# print("points: ",points)
 		# print('x.dtype: ',points.dtype)
 		pointz = torch.cat([points,zs],2)
-		# print(pointz.shape)
+		print(pointz.shape)
 		# print(pointz)
-		pointz = torch.cat([pointz,camera_param],2)
+		# pointz = torch.cat([pointz,camera_param],2)
 		# print(pointz.shape)
 		# print(pointz)
 		l1 = self.linear_1(pointz)
