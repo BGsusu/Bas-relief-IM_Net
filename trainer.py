@@ -23,6 +23,7 @@ from loadData import loadData
 
 from models.Bas_Relief_Net import im_bas_relief_network
 from validator import Validator
+from visualization.sdf_slice import SDF_Slice
 
 
 from torch.utils.tensorboard import SummaryWriter
@@ -35,10 +36,11 @@ class Trainer(object):
 		self.point_dim = 3
 		self.camera_dim = 9
 		self.checkpoint_dir = config.checkpoint_dir
+		self.model_param_path = config.model_param_path
 
 		#获取data loader
 		_loadData = loadData(config)
-		self.train_dataloader, self.validate_dataloader= _loadData.load()
+		self.train_dataloader, self.validate_dataloader, self.slice_dataloader= _loadData.load(config)
 
 		#检测GPU
 		if torch.cuda.is_available():
@@ -149,10 +151,10 @@ class Trainer(object):
 
 			print(" Epoch: [%2d/%2d] time: %4.4f, loss_sp: %.6f" % (epoch, config.epoch, time.time() - start_time, avg_loss_sp/avg_num))
 			self.writer.add_scalar('Loss', avg_loss_sp/avg_num, epoch)
-			if epoch%10==9:
+			if epoch%10==5:
 				# validation
 				self.validation(epoch)
-			if epoch%20==19:
+			if epoch%20==10:
 				if not os.path.exists(self.checkpoint_path):
 					os.makedirs(self.checkpoint_path)
 				save_dir = os.path.join(self.checkpoint_path,self.checkpoint_name+"-"+str(epoch)+".pth")
@@ -174,27 +176,29 @@ class Trainer(object):
 						fout.write(self.checkpoint_manager_list[pointer]+"\n")
 				fout.close()
 
-		if not os.path.exists(self.checkpoint_path):
-			os.makedirs(self.checkpoint_path)
-		save_dir = os.path.join(self.checkpoint_path,self.checkpoint_name+str(config.epoch)+".pth")
-		self.checkpoint_manager_pointer = (self.checkpoint_manager_pointer+1)%self.max_to_keep
-		#delete checkpoint
-		if self.checkpoint_manager_list[self.checkpoint_manager_pointer] is not None:
-			if os.path.exists(self.checkpoint_manager_list[self.checkpoint_manager_pointer]):
-				os.remove(self.checkpoint_manager_list[self.checkpoint_manager_pointer])
-		#save checkpoint
-		torch.save(self.network.state_dict(), save_dir)
-		#update checkpoint manager
-		self.checkpoint_manager_list[self.checkpoint_manager_pointer] = save_dir
-		#write file
-		checkpoint_txt = os.path.join(self.checkpoint_path, "checkpoint")
-		fout = open(checkpoint_txt, 'w')
-		for i in range(self.max_to_keep):
-			pointer = (self.checkpoint_manager_pointer+self.max_to_keep-i)%self.max_to_keep
-			if self.checkpoint_manager_list[pointer] is not None:
-				fout.write(self.checkpoint_manager_list[pointer]+"\n")
-		fout.close()
-		self.writer.close()
+		# 写入训练模型
+		if not config.slice:
+			if not os.path.exists(self.checkpoint_path):
+				os.makedirs(self.checkpoint_path)
+			save_dir = os.path.join(self.checkpoint_path,self.checkpoint_name+str(config.epoch)+".pth")
+			self.checkpoint_manager_pointer = (self.checkpoint_manager_pointer+1)%self.max_to_keep
+			#delete checkpoint
+			if self.checkpoint_manager_list[self.checkpoint_manager_pointer] is not None:
+				if os.path.exists(self.checkpoint_manager_list[self.checkpoint_manager_pointer]):
+					os.remove(self.checkpoint_manager_list[self.checkpoint_manager_pointer])
+			#save checkpoint
+			torch.save(self.network.state_dict(), save_dir)
+			#update checkpoint manager
+			self.checkpoint_manager_list[self.checkpoint_manager_pointer] = save_dir
+			#write file
+			checkpoint_txt = os.path.join(self.checkpoint_path, "checkpoint")
+			fout = open(checkpoint_txt, 'w')
+			for i in range(self.max_to_keep):
+				pointer = (self.checkpoint_manager_pointer+self.max_to_keep-i)%self.max_to_keep
+				if self.checkpoint_manager_list[pointer] is not None:
+					fout.write(self.checkpoint_manager_list[pointer]+"\n")
+			fout.close()
+			self.writer.close()
 
 	def validation(self, epoch):
 		self.network.eval()
@@ -202,3 +206,7 @@ class Trainer(object):
 		print("Validation at epoch : ", epoch, "validation! and loss is : ", v_loss)
 		self.writer.add_scalar('Validation loss', v_loss, epoch)
 		return
+
+	def slice_sdf(self, config):
+		slice = SDF_Slice(config, self.network, self.model_param_path, self.slice_dataloader, self.device, self.checkpoint_path)
+		slice.get_slice()

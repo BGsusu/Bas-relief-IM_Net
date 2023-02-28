@@ -28,8 +28,7 @@ class im_bas_relief_network(nn.Module):
 			net_out = self.generator(point_coord, camera_param, z_vector, is_training=is_training)
 		else:
 			if inputs is not None:
-				z_vector = self.encoder(inputs, is_training=is_training)
-			if z_vector is not None and point_coord is not None:
+				z_vector,_,_ = self.encoder(inputs, is_training=is_training)
 				net_out = self.generator(point_coord, camera_param, z_vector, is_training=is_training)
 			else:
 				net_out = None

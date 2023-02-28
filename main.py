@@ -16,6 +16,8 @@ parser.add_argument("--beta1", action="store", dest="beta1", default=0.5, type=f
 parser.add_argument("--checkpoint_dir", action="store", dest="checkpoint_dir", default="checkpoint", help="Directory name to save the checkpoints [checkpoint]")
 parser.add_argument("--batch_size", action="store", dest="batch_size", default=4, help="batch size of models")
 parser.add_argument("--train", action="store_true", dest="train", default=False, help="True for training, False for testing [False]")
+parser.add_argument("--validate", action="store_true", dest="validate", default=False, help="True for validation")
+parser.add_argument("--slice", action="store_true", dest="slice", default=False, help="True for slice mode")
 parser.add_argument("--start", action="store", dest="start", default=0, type=int, help="In testing, output shapes [start:end]")
 parser.add_argument("--end", action="store", dest="end", default=16, type=int, help="In testing, output shapes [start:end]")
 parser.add_argument("--bas_relief", action="store_true", dest="bas_relief", default=False, help="True for bas_relief [False]")
@@ -24,6 +26,7 @@ parser.add_argument("--bas_relief", action="store_true", dest="bas_relief", defa
 parser.add_argument("--br_data_dir", action="store", dest="br_data_dir", default="/home/daipinxuan/bas_relief/AllData/BasRelief", help="Root directory of bas-relief dataset [data]")
 parser.add_argument("--m_data_dir", action="store", dest="m_data_dir", default="/home/daipinxuan/bas_relief/AllData/OriginalData", help="Root directory of model dataset [data]")
 parser.add_argument("--br_data_type", action="store", dest="br_data_type", default="sdf.npy", help="The type of data")
+parser.add_argument("--model_param_path", action="store", dest="model_param_path", default="/home/sujianping/relief/im-net/IM-NET-pytorch/bas-relief/checkpoint/IM_Bas_Relief_20230227-225937/IM_Bas_Relief.model-30.pth", help="model param path .pth")
 
 FLAGS = parser.parse_args()
 
@@ -32,7 +35,9 @@ if FLAGS.bas_relief:
     
     if FLAGS.train:
         _trainer.train(FLAGS)
-    else:
+    elif FLAGS.validate:
         _trainer.validation(FLAGS)
+    elif FLAGS.slice:
+        _trainer.slice_sdf(FLAGS)
 else:
 	print("Please specify an operation of Net")

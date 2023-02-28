@@ -66,9 +66,14 @@ class loadData():
         
         # 为测试集留下最后200个数据
         if mode is 'train':
+            print("data for training")
             br_filelist = br_filelist[0:len(br_filelist)-200]
         if mode is 'test':
+            print("data for testing")
             br_filelist = br_filelist[len(br_filelist)-200:len(br_filelist)]
+        if mode is 'slice':
+            print("data for slicing")
+            br_filelist = br_filelist[len(br_filelist)-200+1:len(br_filelist)-200+2]
         
         # for test
         # br_filelist = br_filelist[0:len(br_filelist)-1930]
@@ -219,15 +224,25 @@ class loadData():
         return pts, sdf, mpts, camera
     
     # 读入数据的func
-    def load(self):
+    def load(self, config):
+        self.train_dataloader = None
+        self.test_dataloader = None
+        self.slice_dataloader = None
         # 训练数据集
-        pts,sdf,mpts,camera = self.readAllDataFiles('train')
-        self.train_dataset=MyDataset(pts,sdf,mpts,camera)
-        self.train_dataloader= DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, pin_memory=True)
-        # 测试数据集
-        pts,sdf,mpts,camera = self.readAllDataFiles('test')
-        self.test_dataset=MyDataset(pts,sdf,mpts,camera)
-        self.test_dataloader= DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=True, pin_memory=True)
+        if config.train:
+            pts,sdf,mpts,camera = self.readAllDataFiles('train')
+            self.train_dataset=MyDataset(pts,sdf,mpts,camera)
+            self.train_dataloader= DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, pin_memory=True)
+        if config.train or config.validate:
+            # 测试数据集
+            pts,sdf,mpts,camera = self.readAllDataFiles('test')
+            self.test_dataset=MyDataset(pts,sdf,mpts,camera)
+            self.test_dataloader= DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=True, pin_memory=True)
+        if config.slice:
+            # 切片数据
+            pts,sdf,mpts,camera = self.readAllDataFiles('slice')
+            self.slice_dataset=MyDataset(pts,sdf,mpts,camera)
+            self.slice_dataloader= DataLoader(self.slice_dataset, batch_size=1, shuffle=True, pin_memory=True)
         
         print("Data prepared!")
-        return self.train_dataloader, self.test_dataloader
+        return self.train_dataloader, self.test_dataloader, self.slice_dataloader
