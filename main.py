@@ -1,6 +1,6 @@
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 import numpy as np
 
 from trainer import Trainer
@@ -26,7 +26,7 @@ parser.add_argument("--bas_relief", action="store_true", dest="bas_relief", defa
 parser.add_argument("--br_data_dir", action="store", dest="br_data_dir", default="/home/daipinxuan/bas_relief/AllData/BasRelief", help="Root directory of bas-relief dataset [data]")
 parser.add_argument("--m_data_dir", action="store", dest="m_data_dir", default="/home/daipinxuan/bas_relief/AllData/OriginalData", help="Root directory of model dataset [data]")
 parser.add_argument("--br_data_type", action="store", dest="br_data_type", default="sdf.npy", help="The type of data")
-parser.add_argument("--model_param_path", action="store", dest="model_param_path", default="/home/sujianping/relief/im-net/IM-NET-pytorch/bas-relief/checkpoint/IM_Bas_Relief_20230227-225937/IM_Bas_Relief.model-30.pth", help="model param path .pth")
+parser.add_argument("--model_param_path", action="store", dest="model_param_path", default="/home/sujianping/relief/im-net/IM-NET-pytorch/bas-relief/checkpoint/IM_Bas_Relief_20230227-225937/IM_Bas_Relief.model-50.pth", help="model param path .pth")
 
 FLAGS = parser.parse_args()
 
