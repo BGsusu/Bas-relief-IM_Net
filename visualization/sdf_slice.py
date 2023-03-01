@@ -91,7 +91,7 @@ class SDF_Slice(object):
         pts[...,1] *= -1
         return pts
 
-    def sdf_slice(self, net,mpts,z_vector,camera,dim=0,device='cuda', width=250,height=250,depth=0):
+    def sdf_slice(self, net,mpts,z_vector,camera,dim=0,device='cuda', width=250,height=250,depth=0.05):
             pts = self.normalized_slice(width, height, dim=dim, depth=depth, device=device)
             pts=pts.reshape(-1,3)
             #pts=pts.unsqueeze(0)
