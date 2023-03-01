@@ -11,7 +11,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--epoch", action="store", dest="epoch", default=0, type=int, help="Epoch to train [0]")
 parser.add_argument("--iteration", action="store", dest="iteration", default=0, type=int, help="Iteration to train. Either epoch or iteration need to be zero [0]")
-parser.add_argument("--learning_rate", action="store", dest="learning_rate", default=0.00005, type=float, help="Learning rate for adam [0.00005]")
+parser.add_argument("--learning_rate", action="store", dest="learning_rate", default=0.0001, type=float, help="Learning rate for adam [0.00005]")
 parser.add_argument("--beta1", action="store", dest="beta1", default=0.5, type=float, help="Momentum term of adam [0.5]")
 parser.add_argument("--checkpoint_dir", action="store", dest="checkpoint_dir", default="checkpoint", help="Directory name to save the checkpoints [checkpoint]")
 parser.add_argument("--batch_size", action="store", dest="batch_size", default=4, help="batch size of models")
@@ -41,8 +41,10 @@ if FLAGS.bas_relief:
         _trainer = Trainer(FLAGS)
         _trainer.validation(FLAGS)
     elif FLAGS.slice:
-        _trainer = Trainer(FLAGS)
-        _trainer.slice_sdf(FLAGS)
+        # _trainer = Trainer(FLAGS)
+        # _trainer.slice_sdf(FLAGS)
+        _pretrainer = PreTrainer_bas_relief_AE(FLAGS)
+        _pretrainer.train(FLAGS)
     elif FLAGS.pretrain:
         _pretrainer = PreTrainer_bas_relief_AE(FLAGS)
         _pretrainer.train(FLAGS)

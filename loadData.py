@@ -68,10 +68,12 @@ class loadData():
         # 为测试集留下最后200个数据
         if mode is 'train':
             print("data for training")
-            br_filelist = br_filelist[0:len(br_filelist)-200]
+            br_filelist = br_filelist[0:len(br_filelist)-1400]
+            print("traning data set files: ", len(br_filelist))
         if mode is 'test':
             print("data for testing")
             br_filelist = br_filelist[len(br_filelist)-200:len(br_filelist)]
+            print("testing data set files: ", len(br_filelist))
         if mode is 'slice':
             print("data for slicing")
             # br_filelist = br_filelist[0:1]

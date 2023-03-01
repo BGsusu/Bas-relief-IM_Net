@@ -131,6 +131,7 @@ class PreTrainer_bas_relief_AE(object):
 				camera = data[3].to(self.device)
 				camera = camera.type(torch.float32)
 				
+				# 预训练：
 				# 获取浮雕表面的点
 				rpts = pts[:,20000:40000,:]
 				
@@ -144,10 +145,10 @@ class PreTrainer_bas_relief_AE(object):
 				self.optimizer.step()
 
 				avg_loss_sp += errSP.item()
-				# avg_num += 1
+				avg_num += 1
 
-			print(" Epoch: [%2d/%2d] time: %4.4f, loss_sp: %.6f" % (epoch, config.epoch, time.time() - start_time, avg_loss_sp))
-			self.writer.add_scalar('Loss', avg_loss_sp, epoch)
+			print(" Epoch: [%2d/%2d] time: %4.4f, loss_sp: %.6f" % (epoch, config.epoch, time.time() - start_time, avg_loss_sp/avg_num))
+			self.writer.add_scalar('Loss', avg_loss_sp/avg_num, epoch)
 			if epoch%5==1:
 				# validation
 				self.validation(epoch)

@@ -44,6 +44,10 @@ class Validator(object):
             # 相机参数
             camera = data[3].to(self.device)
             camera = camera.type(torch.float32)
+            
+            # 自编码部分
+            # 获取浮雕表面的点
+            rpts = pts[:,20000:40000,:]
 
             # pts = pts.to(device=self.device, dtype=torch.float)
 
@@ -51,12 +55,12 @@ class Validator(object):
             # print("sdf: ",sdf.shape)
             # print("mpts: ",mpts.shape)
             # print("camera: ", camera.shape)
-            _, net_out = self.net(mpts, None, pts, camera, is_training=True)
+            _, net_out = self.net(rpts, None, pts, camera, is_training=True)
             net_out = net_out.squeeze(dim=2)
             # print(net_out.shape)
             errSP = self.network_loss(net_out, sdf)
 
             avg_loss_sp += errSP.item()
-            # avg_num += 1
+            avg_num += 1
 
-        return avg_loss_sp
+        return avg_loss_sp/avg_num

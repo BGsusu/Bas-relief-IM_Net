@@ -21,4 +21,7 @@
     tag：修改decoder输出，将输出从0~1改为-1~1
     实验效果：厚度变得正常了，但是还是退化成了板子
 ---
-## 网络结构：PointNet Encoder + IM-Net Decoder，预训练PointNet Encoder
+## 网络结构：PointNet Encoder + IM-Net Decoder,进行预训练
+    path: relief/im-net/IM-NET-pytorch/bas-relief/checkpoint/IM_Bas_Relief_20230301-212513
+    tag: 添加预训练代码，首先进行浮雕模型在本框架下的自编码训练
+    实验效果：
