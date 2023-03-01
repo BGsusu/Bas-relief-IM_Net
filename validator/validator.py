@@ -57,6 +57,6 @@ class Validator(object):
             errSP = self.network_loss(net_out, sdf)
 
             avg_loss_sp += errSP.item()
-            avg_num += 1
+            # avg_num += 1
 
-        return avg_loss_sp/avg_num
+        return avg_loss_sp

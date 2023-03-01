@@ -151,7 +151,7 @@ class Trainer(object):
 
 			print(" Epoch: [%2d/%2d] time: %4.4f, loss_sp: %.6f" % (epoch, config.epoch, time.time() - start_time, avg_loss_sp/avg_num))
 			self.writer.add_scalar('Loss', avg_loss_sp/avg_num, epoch)
-			if epoch%10==5:
+			if epoch%5==1:
 				# validation
 				self.validation(epoch)
 			if epoch%20==10:
