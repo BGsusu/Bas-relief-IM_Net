@@ -68,7 +68,7 @@ class loadData():
         # 为测试集留下最后200个数据
         if mode is 'train':
             print("data for training")
-            br_filelist = br_filelist[0:len(br_filelist)-1400]
+            br_filelist = br_filelist[0:len(br_filelist)-1933]
             print("traning data set files: ", len(br_filelist))
         if mode is 'test':
             print("data for testing")
@@ -76,8 +76,8 @@ class loadData():
             print("testing data set files: ", len(br_filelist))
         if mode is 'slice':
             print("data for slicing")
-            # br_filelist = br_filelist[0:1]
-            br_filelist = br_filelist[len(br_filelist)-200+2:len(br_filelist)-200+3]
+            br_filelist = br_filelist[0:len(br_filelist)-1933]
+            # br_filelist = br_filelist[len(br_filelist)-200+2:len(br_filelist)-200+3]
         
         # for test
         # br_filelist = br_filelist[0:len(br_filelist)-1930]
@@ -86,6 +86,7 @@ class loadData():
         for idx,file in enumerate(br_filelist):
             # print("relief model file path: ",file)
             data = np.load(file)
+            # np.savetxt("all_pts.txt",data)
             pts.append(np.array(data[:,0:4]))
             sdf.append(np.array(data[:,-1]))
             
@@ -172,32 +173,33 @@ class loadData():
             pos_np = np.array(pos_list)
             up_np = np.array(up_list)
             
-            if not self.pretrain:
-                # 生成相机空间矩阵，并处理pts到相机空间
-                # 1、首先我们求得N = eye – lookat，并把N归一化
-                N = pos_np - fc_np
-                N_norm = N / np.linalg.norm(N)
-                # 2、up和N叉积得到U, U= up X N，归一化U
-                U = np.cross(up_np, N_norm)
-                U_norm = U / np.linalg.norm(U)
-                # 3、然后N和U叉积得到V
-                V = np.cross(N_norm, U_norm)
-                V_norm = V / np.linalg.norm(V)
-                # 4、求出视角坐标系的矩阵表示
-                Z = np.append(N_norm,0)
-                X = np.append(U_norm,0)
-                Y = np.append(V_norm,0)
-                P = np.append(pos_np,1)
-                np_viewcoord = np.array([X,Y,Z,P])
-                M_viewcoord = np.matrix(np_viewcoord)
-                # 5、求逆矩阵
-                M_view = M_viewcoord.I
+            # if not self.pretrain:
+            #     print("camera data process")
+            #     # 生成相机空间矩阵，并处理pts到相机空间
+            #     # 1、首先我们求得N = eye – lookat，并把N归一化
+            #     N = pos_np - fc_np
+            #     N_norm = N / np.linalg.norm(N)
+            #     # 2、up和N叉积得到U, U= up X N，归一化U
+            #     U = np.cross(up_np, N_norm)
+            #     U_norm = U / np.linalg.norm(U)
+            #     # 3、然后N和U叉积得到V
+            #     V = np.cross(N_norm, U_norm)
+            #     V_norm = V / np.linalg.norm(V)
+            #     # 4、求出视角坐标系的矩阵表示
+            #     Z = np.append(N_norm,0)
+            #     X = np.append(U_norm,0)
+            #     Y = np.append(V_norm,0)
+            #     P = np.append(pos_np,1)
+            #     np_viewcoord = np.array([X,Y,Z,P])
+            #     M_viewcoord = np.matrix(np_viewcoord)
+            #     # 5、求逆矩阵
+            #     M_view = M_viewcoord.I
                 
-                # pts = np.array(pts)
-                for idx in range(len(pts[0])):
-                    pts[0][idx][3] = 1
-                    pts[0][idx] = np.dot(pts[0][idx], M_view)
-                # 空间变换完成，但是没有验证，应该是对的
+            #     # pts = np.array(pts)
+            #     for idx in range(len(pts[0])):
+            #         pts[0][idx][3] = 1
+            #         pts[0][idx] = np.dot(pts[0][idx], M_view)
+            #     # 空间变换完成，但是没有验证，应该是对的
             
             camera_list = pos_list+fc_list+up_list
             camera_list = np.array(camera_list)
@@ -238,7 +240,7 @@ class loadData():
         if config.train or config.pretrain:
             pts,sdf,mpts,camera = self.readAllDataFiles('train')
             self.train_dataset=MyDataset(pts,sdf,mpts,camera)
-            self.train_dataloader= DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, pin_memory=True)
+            self.train_dataloader= DataLoader(self.train_dataset, batch_size=1, shuffle=True, pin_memory=True)
         if config.train or config.validate or config.pretrain:
             # 测试数据集
             pts,sdf,mpts,camera = self.readAllDataFiles('test')

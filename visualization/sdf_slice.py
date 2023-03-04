@@ -45,16 +45,20 @@ class SDF_Slice(object):
             print("camera:")
             print(camera.shape)
             print("\n")
+            
+            # 预训练：
+			# 获取浮雕表面的点
+            rpts = pts[:,20000:40000,:]
 
             camera=camera.type(torch.float32)
-            z_vector, d = self.network(mpts, None, pts, camera, is_training=False)
+            z_vector, d = self.network(rpts, None, pts, camera, is_training=False)
             print("z_vector shape:")
             print(z_vector.shape)
             print("\n")
             
-            out_x =self.sdf_slice(self.network, mpts,z_vector, camera,dim=0,device=self.device)
-            out_y =self.sdf_slice(self.network, mpts,z_vector, camera,dim=1,device=self.device)
-            out_z =self.sdf_slice(self.network, mpts,z_vector, camera,dim=2,device=self.device)
+            out_x =self.sdf_slice(self.network, rpts,z_vector, camera,dim=0,device=self.device)
+            out_y =self.sdf_slice(self.network, rpts,z_vector, camera,dim=1,device=self.device)
+            out_z =self.sdf_slice(self.network, rpts,z_vector, camera,dim=2,device=self.device)
             cv2.imwrite(os.path.join('out_x.png'), out_x)
             cv2.imwrite(os.path.join('out_y.png'), out_y)
             cv2.imwrite(os.path.join('out_z.png'), out_z)
@@ -114,7 +118,7 @@ class SDF_Slice(object):
                 #_, d = net(mpts, None, pts.reshape(-1,3), camera, is_training=True)
                 _, d = net(mpts, z_vector, pts, _camera, is_training=False)
             print("d shape:")
-            print(d.shape)
+            # print(d.shape)
             print("\n")
             # print(d[0])
             # print("_________________")
@@ -125,7 +129,7 @@ class SDF_Slice(object):
             # d=d[0]
             d=d.squeeze(1)
             d = d.reshape(width, height, 1)
-
+            # print(d)
             d = d.squeeze().cpu().numpy()
             d = np.clip((d + 1.0) / 2.0, 0.0, 1.0)
             blue = np.clip((d - 0.5)*2.0, 0.0, 1.0)
@@ -139,5 +143,6 @@ class SDF_Slice(object):
                 vis[np.abs(d - 0.02*i) < 0.0015] = 0.8
             vis[np.abs(d - 0.5) < 0.004] = 0.0
             print(vis.shape)
+            # print(vis)
             print("all last")
             return vis*255

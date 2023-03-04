@@ -22,6 +22,18 @@
     实验效果：厚度变得正常了，但是还是退化成了板子
 ---
 ## 网络结构：PointNet Encoder + IM-Net Decoder,进行预训练
-    path: relief/im-net/IM-NET-pytorch/bas-relief/checkpoint/IM_Bas_Relief_20230301-212513
+    path: relief/im-net/IM-NET-pytorch/bas-relief/checkpoint/IM_Bas_Relief_20230301-223539
     tag: 添加预训练代码，首先进行浮雕模型在本框架下的自编码训练
-    实验效果：
+    实验效果：不行
+    
+    path: relief/im-net/IM-NET-pytorch/bas-relief/checkpoint/IM_Bas_Relief_20230302-004347
+    tag: 将预训练模型数量减少至500加快训练
+    实验效果：不行
+
+    path: relief/im-net/IM-NET-pytorch/bas-relief/checkpoint/IM_Bas_Relief_20230302-121403
+    tag: 尝试单个模型过拟合
+    实验效果：不行
+
+    path: relief/im-net/IM-NET-pytorch/bas-relief/checkpoint/IM_Bas_Relief_20230303-204056
+    tag: 尝试修改为无符号距离场
+    实验效果：不行
